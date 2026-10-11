@@ -1,5 +1,29 @@
 # 水电调度 Java 教学：单库 → 双库 → 干支流梯级
 
+## 新增：龙羊峡—拉西瓦12个月调度（实际提供数据）
+
+入口为 [monthly.MonthlyMain](src/main/java/monthly/MonthlyMain.java)，以两站年发电量之和最大为目标。按用户确认，`input4` 为龙羊峡外部来水，`input5` 为两库之间的区间来水，**拉西瓦入库 = 龙羊峡优化总出库 + input5**。不使用 `zPlanLYX`。附带旧数据说明与用户确认口径的差异已记录在[详细教程](docs/longyangxia-laxiwa-monthly.md)。
+
+原参数要求龙羊峡年末2600 m，但12月来水低于生态下泄，即使月初满库，月末也至多约2598.290707 m，故原参数无解。程序不会自动降低生态流量或放宽终点。
+
+```bash
+# 原参数：预期报告水量冲突并非零退出
+mvn compile exec:java "-Dexec.mainClass=monthly.MonthlyMain"
+
+# 用户确认的对照：仅将龙羊峡年末改为2595.2 m，其余沿用原数据/配置
+mvn compile exec:java "-Dexec.mainClass=monthly.MonthlyMain" "-Dexec.args=data/longyangxia-laxiwa results/longyangxia-laxiwa/comparison data/longyangxia-laxiwa/comparison.properties"
+
+mvn test
+```
+
+- [完整中文教程与数学模型](docs/longyangxia-laxiwa-monthly.md)
+- [数据及字段说明](data/longyangxia-laxiwa/README.md)、[原始Excel](data/longyangxia-laxiwa/raw/)、[基础配置](data/longyangxia-laxiwa/dispatch.properties)、[对照配置](data/longyangxia-laxiwa/comparison.properties)
+- [原参数诊断](results/longyangxia-laxiwa/original/summary.md)
+- [对照结果及图表](results/longyangxia-laxiwa/comparison/summary.md)、[12个月详细CSV](results/longyangxia-laxiwa/comparison/dispatch.csv)、[中文简表](results/longyangxia-laxiwa/comparison/monthly-summary.csv)
+- [本次验证与网格敏感性](docs/monthly-validation.md)
+
+以下保留原有三个教学案例。
+
 一个 Maven 项目中同时保留三个可独立运行的案例，学习“水量平衡 → 发电计算 → 联合状态 → 动态规划 → 回溯”。无需切换 Git 分支，也没有多模块结构。目标均为**整个调度期所有参与电站的总发电量最大**，不包含电价、风光储或电网约束。
 
 双库、四库及新增低流量补点为**教学合成数据，非真实电站资料**。单库原始 Excel 原样保留，原数据来源未在本次核实，不应当作经校准的工程资料。
