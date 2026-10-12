@@ -1,0 +1,2 @@
+# Preserve source bytes across Windows/Linux checkouts so SHA-256 remains reproducible.
+raw/* -text
